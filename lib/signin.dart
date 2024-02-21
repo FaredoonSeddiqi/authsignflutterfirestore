@@ -11,12 +11,33 @@ class loginpage extends StatefulWidget {
 class _loginpageState extends State<loginpage> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  void signup(BuildContext context) async {
+    try {
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: _email.text.trim(),
+        password: 'dummyPassword',
+      );
+
+      // Send verification email to the user
+      await userCredential.user?.sendEmailVerification();
+    } catch (e) {
+      print(e);
+    }
+  }
 
   void dispose() {
     _email.dispose();
     _password.dispose();
     super.dispose();
   }
+
+  // Future<void> sendemailvarification() async {
+  //   final user = FirebaseAuth.instance.currentUser!;
+  //   await user.sendEmailVerification();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +117,35 @@ class _loginpageState extends State<loginpage> {
               child: Text("sign up"),
               style: style,
             ),
+            ElevatedButton(
+              onPressed: passwordreset,
+              child: Text("reset password"),
+              style: style,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                signup(context);
+              },
+              child: Text("varifiy email"),
+              style: style,
+            ),
           ],
         ),
       ),
     );
   }
+
+  Future passwordreset() async {
+    await FirebaseAuth.instance
+        .sendPasswordResetEmail(email: _email.text.trim());
+  }
+
+  // Future sendemailvarification() async {
+  //   try {
+  //     final user = FirebaseAuth.instance.currentUser!;
+  //     await user.sendEmailVerification();
+  //   } catch (e) {
+  //     print('varifiy email');
+  //   }
+  // }
 }
